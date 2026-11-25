@@ -1,4 +1,5 @@
-# One Punch Man - Rules (draft v2, simplest version)
+# One Punch Man - Rules
+Version: 0.1
 
 Co-op, sandboxy. All players win or lose together.
 **[S]** = my suggestion filling a gap. It stands until you change it.
@@ -17,10 +18,11 @@ You lose if civilians reach 0.
   - **Toll**: civilians it kills at the end of each round it survives.
   - **Fame**: how many fame tokens it drops when killed.
   - **Terminal** or not: a terminal monster ends the encounter when killed.
-- **Hero deck**: each hero card has a name, a picture, and per class
-  (C / B / A / S):
-  - an **attack effect**: usually an attack pattern (a cardboard stencil with
-    holes), maybe with extras;
+- **Hero deck**: each hero card has a name, a picture, a cost, and:
+  - a **move** per class (C / B / A / S). A move is a named attack pattern
+    (a cardboard stencil with holes). Moves are shared between heroes, so each
+    stencil is made once;
+  - an **attack effect**: usually using a move, maybe with extras;
   - a **support effect**: happens automatically at the end of the round if the
     hero is hired but didn't attack. E.g. Mumen Rider: rescue 1 civilian
     (un-cross 1 box).
@@ -56,14 +58,14 @@ You lose if civilians reach 0.
 
    Each hero acts at most once per round. The round's deploy step ends when
    everyone passes in a row.
-4. **Attack**: lay the hero's stencil (for their current class) anywhere on the
-   monster grid. You may use the pattern of the hero's current class or any
-   lower class. You may rotate it but not mirror it. It must fit inside the
+4. **Attack**: pick one of the hero's moves of their current class or any lower
+   class, and lay its stencil anywhere on the monster grid. You may rotate it
+   but not mirror it. It must fit inside the
    grid. Cross out the health cells under the holes.
 5. **Monster dies?** When all its health cells are crossed:
    - Its fame tokens are given out; the players decide together how.
      1 fame token = the hero moves **up one slot** on the ladder and swaps with
-     the hero above. Crossing into a new class = new attack pattern.
+     the hero above. Crossing into a new class = new move.
    - Non-terminal: the next monster is drawn at the start of next round.
    - Terminal: the encounter ends (see End of encounter).
 6. **Support**: every hired hero who didn't attack this round applies their

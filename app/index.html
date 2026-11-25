@@ -1,0 +1,509 @@
+<title>One Punch Playtest</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;600;700&family=Archivo+Black&display=swap">
+<style>
+/* Layout: one phone column. Sticky status bar, monster grid on top, actions below. */
+:root {
+  --paper: #f2f3ef; --surface: #ffffff; --ink: #16181d; --muted: #5c6270; --line: #d8dad3;
+  --cape: #e3b21b; --cape-ink: #2a2100; --threat: #c4372b; --civ: #2c6d8c; --ok: #2d8550;
+  --hit: rgba(227, 178, 27, .55); --miss: rgba(227, 178, 27, .22);
+  --display: "Archivo Black", "Arial Black", Impact, sans-serif;
+  --body: "Archivo", "Helvetica Neue", Arial, sans-serif;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --paper: #111216; --surface: #1b1d23; --ink: #ecebe6; --muted: #9ca2ad; --line: #2d3039;
+  --cape: #f0c445; --cape-ink: #221a00; --threat: #ee5c4d; --civ: #62aacb; --ok: #4fb879;
+  --hit: rgba(240, 196, 69, .6); --miss: rgba(240, 196, 69, .2); color-scheme: dark } }
+:root[data-theme="dark"] {
+  --paper: #111216; --surface: #1b1d23; --ink: #ecebe6; --muted: #9ca2ad; --line: #2d3039;
+  --cape: #f0c445; --cape-ink: #221a00; --threat: #ee5c4d; --civ: #62aacb; --ok: #4fb879;
+  --hit: rgba(240, 196, 69, .6); --miss: rgba(240, 196, 69, .2); color-scheme: dark }
+
+* { box-sizing: border-box }
+body { background: var(--paper); color: var(--ink); font: 15px/1.4 var(--body); margin: 0 }
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--surface) }
+.wrap { max-width: 560px; margin: 0 auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); padding-block: 12px 48px; display: grid; gap: 14px }
+h1, h2, h3 { font-family: var(--display); font-weight: 400; margin: 0; text-wrap: balance; letter-spacing: .01em }
+h1 { font-size: 26px; line-height: 1.05 }
+h2 { font-size: 20px }
+h3 { font-size: 15px }
+button { font: 600 14px var(--body); color: var(--ink); background: var(--surface); border: 1.5px solid var(--ink); border-radius: 6px; padding: 9px 12px; cursor: pointer; min-height: 40px }
+button:focus-visible { outline: 3px solid var(--cape); outline-offset: 2px }
+button:disabled { opacity: .35; cursor: default }
+button.primary { background: var(--ink); color: var(--paper) }
+button.cape { background: var(--cape); color: var(--cape-ink); border-color: var(--cape) }
+button.ghost { border-color: var(--line) }
+button.on { background: var(--ink); color: var(--paper) }
+.label { font-size: 11px; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); font-weight: 700 }
+.muted { color: var(--muted) }
+.row { display: flex; gap: 8px; flex-wrap: wrap; align-items: center }
+.between { justify-content: space-between }
+
+/* status bar */
+.bar { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; background: var(--surface); border-bottom: 1.5px solid var(--ink) }
+.bar .inner { max-width: 560px; margin: 0 auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); padding-block: 8px; display: grid; gap: 6px }
+.stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px }
+.stat { display: grid; gap: 0 }
+.stat b { font: 400 20px var(--display); font-variant-numeric: tabular-nums }
+.stat.civ b { color: var(--civ) }
+.stat.danger b { color: var(--threat) }
+.saitama-on { background: var(--cape); color: var(--cape-ink); border-radius: 4px; padding: 0 6px; font-weight: 700 }
+
+.turn { font: 400 18px var(--display); padding: 10px 12px; border-radius: 6px; background: var(--ink); color: var(--paper) }
+.turn small { display: block; font: 600 13px var(--body); opacity: .75 }
+
+/* monster */
+.panel { background: var(--surface); border: 1.5px solid var(--line); border-radius: 8px; padding: 12px; display: grid; gap: 10px; min-width: 0 }
+.panel.focus { border-color: var(--ink) }
+.chips { display: flex; gap: 6px; flex-wrap: wrap }
+.chip { font-size: 12px; font-weight: 700; border: 1.5px solid var(--line); border-radius: 999px; padding: 2px 8px; font-variant-numeric: tabular-nums }
+.chip.threat { border-color: var(--threat); color: var(--threat) }
+.chip.term { background: var(--threat); color: #fff; border-color: var(--threat) }
+.grid { display: grid; grid-template-columns: repeat(var(--cols), 1fr); gap: 3px; width: min(100%, calc(var(--cols) * 54px)); margin: 0 auto; touch-action: manipulation }
+.cell { aspect-ratio: 1; border-radius: 3px; background: transparent; border: 1px dashed var(--line); position: relative; padding: 0; min-height: 0 }
+.cell.hp { background: var(--ink); border: 1px solid var(--ink) }
+.cell.x { background: transparent; border: 1px solid var(--line) }
+.cell.x::after { content: "\2715"; position: absolute; inset: 0; display: grid; place-items: center; color: var(--threat); font: 700 clamp(14px, 5vw, 24px) var(--body) }
+.cell.pv { box-shadow: inset 0 0 0 3px var(--cape); background-color: var(--miss) }
+.cell.hp.pv { background: var(--cape) }
+.cell.pickable { outline: 2px solid var(--cape); outline-offset: -2px; cursor: pointer }
+.extra { font-size: 13px; border-left: 3px solid var(--threat); padding-left: 8px }
+
+/* stencil mini */
+.mini { display: inline-grid; gap: 1px; vertical-align: middle }
+.mini i { width: 7px; height: 7px; border-radius: 1px; background: var(--line) }
+.mini i.h { background: var(--ink) }
+.moves { display: flex; gap: 6px; flex-wrap: wrap }
+.moves button { display: flex; gap: 8px; align-items: center; padding: 6px 10px }
+.moves button.on .mini i.h { background: var(--paper) }
+.moves button.on .mini i { background: rgba(127,127,127,.4) }
+
+/* heroes */
+.heroes { display: grid; gap: 8px }
+.hero { border: 1.5px solid var(--line); border-radius: 8px; padding: 10px; display: grid; gap: 6px; background: var(--surface) }
+.hero.done { opacity: .55 }
+.hero .name { font: 400 16px var(--display) }
+.cls { font: 400 13px var(--display); border-radius: 4px; padding: 1px 6px; background: var(--ink); color: var(--paper) }
+.cls.S { background: var(--cape); color: var(--cape-ink) }
+.hero p { margin: 0; font-size: 13px }
+.hero p b { font-weight: 700 }
+
+/* ladder & log */
+details { background: var(--surface); border: 1.5px solid var(--line); border-radius: 8px; padding: 10px 12px }
+summary { cursor: pointer; font: 400 15px var(--display) }
+ol.ladder { list-style: none; margin: 8px 0 0; padding: 0; display: grid; gap: 2px; font-variant-numeric: tabular-nums }
+ol.ladder li { display: grid; grid-template-columns: 26px 28px 1fr auto; gap: 8px; align-items: center; padding: 3px 4px; border-radius: 4px }
+ol.ladder li.sai { background: var(--cape); color: var(--cape-ink) }
+ol.ladder li .n { color: var(--muted); text-align: right }
+ol.ladder li.sai .n { color: inherit }
+ol.ladder li button { min-height: 34px; padding: 4px 12px }
+.tag { font-size: 11px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: .06em }
+ul.log { margin: 8px 0 0; padding-left: 18px; font-size: 13px; display: grid; gap: 2px }
+ul.log li.sep { list-style: none; margin-left: -18px; font-weight: 700; margin-top: 6px }
+
+.start { display: grid; gap: 16px; padding-top: 20px }
+.seg { display: flex; gap: 6px }
+.seg button { flex: 1; font: 400 18px var(--display) }
+.big { font-size: 16px; padding: 12px; min-height: 48px }
+.over h1 { font-size: 34px }
+@media (prefers-reduced-motion: no-preference) { .cell { transition: background .12s } }
+</style>
+
+<div id="app"></div>
+
+<script>
+const D = {"version": "0.1", "setup": {"civilians": 30, "money": 5, "rosterSize": 3, "civiliansPerMoney": 3, "regrowth": 2, "ladder": {"S": 2, "A": 3, "B": 5, "C": 6}, "normalsPerEncounter": 4, "terminalOrder": ["deep-sea-king", "elder-centipede", "boros"]}, "moves": [{"id": "jab", "name": "Jab", "grid": ["#"]}, {"id": "one-two", "name": "One-Two", "grid": ["##"]}, {"id": "slip", "name": "Slip", "grid": ["#.", ".#"]}, {"id": "twin-strike", "name": "Twin Strike", "grid": ["#.#"]}, {"id": "combo", "name": "Combo", "grid": ["###"]}, {"id": "flicker", "name": "Flicker", "grid": ["#.#.#"]}, {"id": "flowing-strike", "name": "Flowing Strike", "grid": ["#..", ".#.", "..#"]}, {"id": "hook", "name": "Hook", "grid": ["##", ".#"]}, {"id": "barrage", "name": "Barrage", "grid": ["####"]}, {"id": "block", "name": "Block", "grid": ["##", "##"]}, {"id": "four-corners", "name": "Four Corners", "grid": ["#.#", "...", "#.#"]}, {"id": "hammer", "name": "Hammer", "grid": ["###", ".#."]}, {"id": "zigzag", "name": "Zigzag", "grid": ["##.", ".##"]}, {"id": "arch", "name": "Arch", "grid": ["###", "#.#"]}, {"id": "beam", "name": "Beam", "grid": ["#####"]}, {"id": "burst", "name": "Burst", "grid": [".#.", "###", ".#."]}, {"id": "charge", "name": "Charge", "grid": ["###", ".##"]}, {"id": "cross-cut", "name": "Cross Cut", "grid": ["#.#", ".#.", "#.#"]}, {"id": "lightning-step", "name": "Lightning Step", "grid": ["#.#.#", ".#.#."]}, {"id": "cascade", "name": "Cascade", "grid": ["##..", ".##.", "..##"]}, {"id": "double-fist", "name": "Double Fist", "grid": ["###", "###"]}, {"id": "gadget-spread", "name": "Gadget Spread", "grid": ["#.#.#", ".....", "#.#.#"]}, {"id": "gate", "name": "Gate", "grid": ["###", "#..", "###"]}, {"id": "tank-press", "name": "Tank Press", "grid": [".#.", "###", "###"]}, {"id": "bear-hug", "name": "Bear Hug", "grid": ["#..#", "#..#", "####"]}, {"id": "long-cascade", "name": "Long Cascade", "grid": ["##...", ".##..", "..##.", "...##"]}, {"id": "ring", "name": "Ring", "grid": ["###", "#.#", "###"]}, {"id": "wall", "name": "Wall", "grid": ["####", "####"]}, {"id": "big-x", "name": "Big X", "grid": ["#...#", ".#.#.", "..#..", ".#.#.", "#...#"]}, {"id": "crush", "name": "Crush", "grid": ["###", "###", "###"]}, {"id": "torrent", "name": "Torrent", "grid": ["###..", ".###.", "..###"]}, {"id": "avalanche", "name": "Avalanche", "grid": [".##.", "####", "####"]}, {"id": "grand-hug", "name": "Grand Hug", "grid": ["#..#", "#..#", "#..#", "####"]}, {"id": "missile-rain", "name": "Missile Rain", "grid": ["#.#.#", ".#.#.", "#.#.#", ".#.#."]}, {"id": "mega-beam", "name": "Mega Beam", "grid": ["######", "######"]}, {"id": "psychic-ring", "name": "Psychic Ring", "grid": ["####", "#..#", "#..#", "####"]}, {"id": "blade-storm", "name": "Blade Storm", "grid": ["#.#.#", ".#.#.", "#.#.#", ".#.#.", "#.#.#"]}], "heroes": [{"id": "mumen-rider", "name": "Mumen Rider", "cost": 1, "moves": {"C": "one-two", "B": "combo", "A": "arch", "S": "double-fist"}, "attack": "one move of current class or lower.", "support": "rescue 1 civilian (A/S: 2).", "fx": {"rescue": {"C": 1, "B": 1, "A": 2, "S": 2}}}, {"id": "snek", "name": "Snek", "cost": 1, "moves": {"C": "one-two", "B": "hook", "A": "zigzag", "S": "charge"}, "attack": "one move of current class or lower. Ambitious: if this attack kills the monster, Snek moves up 1 extra ladder slot.", "support": "none.", "fx": {"killBonusSlots": 1}}, {"id": "zombieman", "name": "Zombieman", "cost": 2, "moves": {"C": "jab", "B": "one-two", "A": "combo", "S": "barrage"}, "attack": "one move of current class or lower. Can attack twice per round.", "support": "none.", "fx": {"attacksPerRound": 2}}, {"id": "puri-puri-prisoner", "name": "Puri-Puri Prisoner", "cost": 2, "moves": {"C": "hook", "B": "arch", "A": "bear-hug", "S": "grand-hug"}, "attack": "one move of current class or lower.", "support": "rescue 1 civilian.", "fx": {"rescue": {"C": 1, "B": 1, "A": 1, "S": 1}}}, {"id": "metal-bat", "name": "Metal Bat", "cost": 2, "moves": {"C": "one-two", "B": "hammer", "A": "double-fist", "S": "wall"}, "attack": "one move of current class or lower. If he attacked this same monster in an earlier round, also cross out 1 more health cell anywhere.", "support": "none.", "fx": {"repeatBonus": 1}}, {"id": "fubuki", "name": "Fubuki", "cost": 2, "moves": {"C": "one-two", "B": "block", "A": "gate", "S": "crush"}, "attack": "one move of current class or lower.", "support": "+1 money.", "fx": {"money": 1}}, {"id": "drive-knight", "name": "Drive Knight", "cost": 2, "moves": {"C": "hook", "B": "zigzag", "A": "cascade", "S": "long-cascade"}, "attack": "one move of current class or lower. May mirror it.", "support": "none.", "fx": {"mirror": true}}, {"id": "tank-top-master", "name": "Tank-Top Master", "cost": 2, "moves": {"C": "one-two", "B": "hammer", "A": "tank-press", "S": "avalanche"}, "attack": "one move of current class or lower.", "support": "this round's toll -1.", "fx": {"tollMinus": 1}}, {"id": "king", "name": "King", "cost": 2, "moves": null, "attack": "crosses nothing. Instead, Saitama appears right now: take him out of the hero deck (or discard pile).", "support": "none.", "fx": {"summonSaitama": true}}, {"id": "genos", "name": "Genos", "cost": 3, "moves": {"C": "combo", "B": "barrage", "A": "beam", "S": "mega-beam"}, "attack": "one move of current class or lower.", "support": "cross out 1 health cell anywhere.", "fx": {"crossCells": 1}}, {"id": "child-emperor", "name": "Child Emperor", "cost": 3, "moves": {"C": "twin-strike", "B": "four-corners", "A": "gadget-spread", "S": "missile-rain"}, "attack": "one move of current class or lower.", "support": "look at the top 3 hero cards and put them back in any order (can delay Saitama).", "fx": {"peekHeroes": 3}}, {"id": "flashy-flash", "name": "Flashy Flash", "cost": 3, "moves": {"C": "jab", "B": "twin-strike", "A": "flicker", "S": "lightning-step"}, "attack": "one move of current class or lower. Attacking with Flash doesn't end your turn; take another action.", "support": "none.", "fx": {"freeAction": true}}, {"id": "silver-fang", "name": "Silver Fang", "cost": 4, "moves": {"C": "slip", "B": "flowing-strike", "A": "cascade", "S": "torrent"}, "attack": "one move of current class or lower.", "support": "once per encounter, move a hero ranked below him up 1 ladder slot.", "fx": {"promoteBelow": 1}}, {"id": "atomic-samurai", "name": "Atomic Samurai", "cost": 4, "moves": {"C": "twin-strike", "B": "cross-cut", "A": "big-x", "S": "blade-storm"}, "attack": "one move of current class or lower.", "support": "none.", "fx": {}}, {"id": "tatsumaki", "name": "Tatsumaki", "cost": 5, "moves": {"C": "twin-strike", "B": "burst", "A": "ring", "S": "psychic-ring"}, "attack": "one move of current class or lower.", "support": "this round's toll -1.", "fx": {"tollMinus": 1}}], "saitama": {"id": "saitama", "name": "Saitama", "text": ["Not hireable.", "Appears: when drawn into the roster (draw a replacement, he takes no roster spot) or summoned by King. Stays until the encounter ends.", "While present: at the end of each round he kills every monster in play and takes all their fame (he moves up the ladder).", "Ladder: starts in the bottom slot."]}, "monsters": [{"id": "mosquito-girl", "name": "Mosquito Girl", "level": "Wolf", "toll": 1, "fame": 1, "terminal": false, "extra": "", "fx": {}, "grid": ["#....#", "......", "..#...", "......", "#....#"]}, {"id": "frog-man", "name": "Frog Man", "level": "Wolf", "toll": 1, "fame": 1, "terminal": false, "extra": "", "fx": {}, "grid": [".##.", ".##."]}, {"id": "crablante", "name": "Crablante", "level": "Wolf", "toll": 1, "fame": 1, "terminal": false, "extra": "", "fx": {}, "grid": ["#....#", ".####."]}, {"id": "subterranean-king", "name": "Subterranean King", "level": "Wolf", "toll": 1, "fame": 1, "terminal": false, "extra": "", "fx": {}, "grid": ["..#..", ".###.", "..#.."]}, {"id": "hammerhead", "name": "Hammerhead", "level": "Tiger", "toll": 2, "fame": 2, "terminal": false, "extra": "", "fx": {}, "grid": [".###..", "######"]}, {"id": "vaccine-man", "name": "Vaccine Man", "level": "Tiger", "toll": 2, "fame": 2, "terminal": false, "extra": "", "fx": {}, "grid": ["..##..", ".####.", ".####.", "..#..."]}, {"id": "marugori", "name": "Marugori", "level": "Tiger", "toll": 2, "fame": 2, "terminal": false, "extra": "", "fx": {}, "grid": [".####.", "######"]}, {"id": "beast-king", "name": "Beast King", "level": "Tiger", "toll": 2, "fame": 2, "terminal": false, "extra": "", "fx": {}, "grid": ["#.##.#", ".####.", "..#..."]}, {"id": "carnage-kabuto", "name": "Carnage Kabuto", "level": "Demon", "toll": 3, "fame": 3, "terminal": false, "extra": "from his 3rd round alive, toll is doubled.", "fx": {"doubleTollFromRound": 3}, "grid": ["..##..", ".####.", "######", "#....#"]}, {"id": "ancient-king", "name": "Ancient King", "level": "Demon", "toll": 3, "fame": 3, "terminal": false, "extra": "", "fx": {}, "grid": ["######", "#....#", "######"]}, {"id": "melzargard", "name": "Melzargard", "level": "Demon", "toll": 3, "fame": 3, "terminal": false, "extra": "at the end of each round, un-cross 2 health cells.", "fx": {"regen": 2}, "grid": ["#.#.#.", ".#.#.#", "#.#.#.", ".#.#.#"]}, {"id": "gouketsu", "name": "Gouketsu", "level": "Demon", "toll": 3, "fame": 3, "terminal": false, "extra": "", "fx": {}, "grid": [".####.", "##..##", "##..##", ".###.."]}, {"id": "deep-sea-king", "name": "Deep Sea King", "level": "Demon", "toll": 3, "fame": 4, "terminal": true, "extra": "toll +1 for each round he survives.", "fx": {"tollGrowth": 1}, "grid": ["..##..", ".####.", "######", ".####."]}, {"id": "elder-centipede", "name": "Elder Centipede", "level": "Dragon", "toll": 4, "fame": 5, "terminal": true, "extra": "armored; stencils with fewer than 4 holes do nothing.", "fx": {"armor": 4}, "grid": ["######", "#.....", "######", ".....#", "######"]}, {"id": "boros", "name": "Boros", "level": "Dragon", "toll": 5, "fame": 6, "terminal": true, "extra": "at the end of each round, un-cross 3 health cells.", "fx": {"regen": 3}, "grid": [".####.", "######", "##..##", "######", ".####."]}]};
+const ST = D.setup;
+const CLASSES = ['C', 'B', 'A', 'S'];
+const MOVE = Object.fromEntries(D.moves.map(m => [m.id, m]));
+const HERO = Object.fromEntries(D.heroes.map(h => [h.id, h]));
+HERO.saitama = { id: 'saitama', name: 'Saitama', cost: 0, moves: null, fx: {} };
+const MON = Object.fromEntries(D.monsters.map(m => [m.id, m]));
+const KEY = 'opm-playtest';
+
+let S = null;            // game state (undoable)
+let history = [];        // undo snapshots
+let ui = { attack: null, confirmNew: false, players: 2, msg: '' }; // transient UI only
+
+// ---------- helpers
+const shuffle = a => { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
+const cellsOf = g => g.flatMap((row, r) => [...row].map((ch, c) => ch === '#' ? [r, c] : null).filter(Boolean));
+const norm = cs => { const mr = Math.min(...cs.map(x => x[0])), mc = Math.min(...cs.map(x => x[1])); return cs.map(([r, c]) => [r - mr, c - mc]); };
+const rot = cs => norm(cs.map(([r, c]) => [c, -r]));
+const mir = cs => norm(cs.map(([r, c]) => [r, -c]));
+const dims = cs => [Math.max(...cs.map(x => x[0])) + 1, Math.max(...cs.map(x => x[1])) + 1];
+const k = (r, c) => r + ',' + c;
+function log(t, sep) { S.log.push(sep ? '§' + t : t); }
+
+function classAt(i) { let n = 0; for (const c of ['S', 'A', 'B', 'C']) { n += ST.ladder[c]; if (i < n) return c; } return 'C'; }
+const heroClass = id => classAt(S.ladder.indexOf(id));
+function moveUp(id, n) { for (let t = 0; t < n; t++) { const i = S.ladder.indexOf(id); if (i <= 0) return; [S.ladder[i - 1], S.ladder[i]] = [S.ladder[i], S.ladder[i - 1]]; } }
+
+function usableMoves(id) {
+  const h = HERO[id]; if (!h.moves) return [];
+  const top = CLASSES.indexOf(heroClass(id)); const seen = new Set(); const out = [];
+  for (let i = top; i >= 0; i--) { const m = h.moves[CLASSES[i]]; if (!seen.has(m)) { seen.add(m); out.push({ cls: CLASSES[i], id: m }); } }
+  return out;
+}
+function monGrid() { return MON[S.monster.id].grid; }
+function healthLeft() { const cr = new Set(S.monster.crossed); return cellsOf(monGrid()).filter(([r, c]) => !cr.has(k(r, c))); }
+function fits(moveId, mirrorOk) {
+  const [R, C] = [monGrid().length, monGrid()[0].length];
+  let cs = cellsOf(MOVE[moveId].grid);
+  for (const base of mirrorOk ? [cs, mir(cs)] : [cs]) { let x = base; for (let i = 0; i < 4; i++) { const [h, w] = dims(x); if (h <= R && w <= C) return true; x = rot(x); } }
+  return false;
+}
+const hiredOf = id => S.hired.find(h => h.id === id);
+const actsAllowed = id => HERO[id].fx.attacksPerRound || 1;
+
+// ---------- persistence
+function save() { try { localStorage.setItem(KEY, JSON.stringify({ S, history: history.slice(-30) })); } catch (e) {} }
+function load() { try { const x = JSON.parse(localStorage.getItem(KEY)); if (x && x.S && x.S.v === D.version) { S = x.S; history = x.history || []; } } catch (e) {} }
+function act(fn) { history.push(JSON.stringify(S)); if (history.length > 40) history.shift(); fn(); ui.msg = ''; save(); render(); }
+function undo() { if (!history.length) return; S = JSON.parse(history.pop()); ui.attack = null; save(); render(); }
+
+// ---------- game flow
+function newGame(players) {
+  const normals = shuffle(D.monsters.filter(m => !m.terminal).map(m => m.id));
+  const deck = []; const n = ST.normalsPerEncounter;
+  ST.terminalOrder.forEach((t, i) => { const last = i === ST.terminalOrder.length - 1; deck.push(...normals.slice(i * n, last ? undefined : (i + 1) * n), t); });
+  S = {
+    v: D.version, players, cur: 0, passes: 0, encounter: 1, round: 0,
+    money: ST.money, civ: ST.civilians, monsterDeck: deck, monster: null,
+    heroDeck: shuffle([...D.heroes.map(h => h.id), 'saitama']), heroDiscard: [], roster: [], hired: [],
+    ladder: [...shuffle(D.heroes.map(h => h.id)), 'saitama'],
+    saitama: false, sfUsed: false, terminalKilled: false, tollMinus: 0,
+    phase: 'deploy', ctx: 'deploy', eor: null, pick: null, fame: null, peek: null, log: [], result: null, lastKill: null,
+  };
+  history = [];
+  log(`New game, ${players} player${players > 1 ? 's' : ''}, rules v${D.version}`);
+  startRound();
+}
+function drawHero() { if (!S.heroDeck.length) { S.heroDeck = shuffle(S.heroDiscard); S.heroDiscard = []; } return S.heroDeck.shift() || null; }
+function saitamaAppears(why) {
+  if (S.saitama) return;
+  S.heroDeck = S.heroDeck.filter(x => x !== 'saitama'); S.heroDiscard = S.heroDiscard.filter(x => x !== 'saitama');
+  S.saitama = true; log(`Saitama appears (${why}). He will finish every monster at the end of each round.`);
+}
+function startRound() {
+  S.round++; S.tollMinus = 0; S.terminalKilled = false; S.lastKill = null;
+  log(`Encounter ${S.encounter} · Round ${S.round}`, true);
+  if (!S.monster) {
+    if (!S.monsterDeck.length) return endGame('win');
+    const id = S.monsterDeck.shift();
+    S.monster = { id, crossed: [], survived: 0, attackedBy: {} };
+    log(`${MON[id].name} appears (${MON[id].level}${MON[id].terminal ? ', terminal' : ''}).`);
+  }
+  S.heroDiscard.push(...S.roster); S.roster = [];
+  while (S.roster.length < ST.rosterSize) {
+    const id = drawHero(); if (!id) break;
+    if (id === 'saitama') { saitamaAppears('drawn into the roster'); continue; }
+    S.roster.push(id);
+  }
+  S.hired.forEach(h => { h.acts = 0; });
+  S.passes = 0; S.phase = 'deploy'; S.ctx = 'deploy';
+}
+function nextPlayer(free) { S.passes = 0; if (!free) S.cur = (S.cur + 1) % S.players; }
+
+function strike(heroId, hire, cells) {
+  const h = HERO[heroId], m = MON[S.monster.id];
+  if (hire) { S.money -= h.cost; S.roster = S.roster.filter(x => x !== heroId); S.hired.push({ id: heroId, acts: 0 }); log(`Hired ${h.name} for ${h.cost}.`); }
+  const e = hiredOf(heroId); e.acts++;
+  const prior = S.monster.attackedBy[heroId] || [];
+  const bonus = h.fx.repeatBonus && prior.some(r => r < S.round);
+  S.monster.attackedBy[heroId] = [...prior, S.round];
+  const hpSet = new Set(cellsOf(m.grid).map(([r, c]) => k(r, c))); const cr = new Set(S.monster.crossed);
+  if (m.fx.armor && cells.length < m.fx.armor) { log(`${h.name} hits ${m.name}: armored, stencils under ${m.fx.armor} holes do nothing.`); }
+  else {
+    let n = 0; cells.forEach(([r, c]) => { if (hpSet.has(k(r, c)) && !cr.has(k(r, c))) { cr.add(k(r, c)); n++; } });
+    S.monster.crossed = [...cr];
+    log(`${h.name} hits ${m.name}: ${n} cell${n === 1 ? '' : 's'} crossed.`);
+  }
+  nextPlayer(h.fx.freeAction);
+  S.ctx = 'deploy';
+  if (!healthLeft().length) return kill(heroId);
+  if (bonus) { S.pick = { n: h.fx.repeatBonus, by: heroId, why: `${h.name}: hit this monster in an earlier round, cross ${h.fx.repeatBonus} more cell` }; S.phase = 'pick'; }
+}
+function kingSummons(heroId, hire) {
+  const h = HERO[heroId];
+  if (hire) { S.money -= h.cost; S.roster = S.roster.filter(x => x !== heroId); S.hired.push({ id: heroId, acts: 0 }); log(`Hired ${h.name} for ${h.cost}.`); }
+  hiredOf(heroId).acts++;
+  if (S.saitama) log('King calls for help, but Saitama is already here.'); else saitamaAppears('summoned by King');
+  nextPlayer(false);
+}
+function pass() { log(`Player ${S.cur + 1} passes.`); S.passes++; S.cur = (S.cur + 1) % S.players; if (S.passes >= S.players) startEOR(); }
+
+function kill(byId) {
+  const m = MON[S.monster.id];
+  log(`${m.name} is defeated by ${HERO[byId].name}!`);
+  if (HERO[byId].fx.killBonusSlots) { moveUp(byId, HERO[byId].fx.killBonusSlots); log(`${HERO[byId].name} climbs ${HERO[byId].fx.killBonusSlots} extra slot (kill bonus).`); }
+  if (m.terminal) S.terminalKilled = true;
+  S.lastKill = m.id; S.monster = null;
+  S.fame = { left: m.fame, total: m.fame, name: m.name }; S.phase = 'fame';
+}
+function finishInteraction() {
+  S.phase = null; S.pick = null; S.peek = null; S.fame = null;
+  if (S.ctx === 'deploy') { if (!S.monster) { log('No monster left this round, deploying ends.'); startEOR(); } else S.phase = 'deploy'; }
+  else runEOR();
+}
+function afterPick() { if (S.monster && !healthLeft().length) { const by = S.pick.by; S.pick = null; return kill(by); } finishInteraction(); }
+
+function startEOR() { S.ctx = 'eor'; S.phase = 'eor'; S.eor = { step: 'support', queue: S.hired.filter(h => h.acts === 0).map(h => h.id) }; runEOR(); }
+function runEOR() {
+  S.phase = 'eor'; const E = S.eor;
+  while (true) {
+    if (E.step === 'support') {
+      if (!E.queue.length) { E.step = 'toll'; continue; }
+      const id = E.queue.shift(), h = HERO[id], fx = h.fx, cls = heroClass(id);
+      if (fx.rescue) { const n = fx.rescue[cls]; const before = S.civ; S.civ = Math.min(ST.civilians, S.civ + n); log(`${h.name} rescues ${S.civ - before} civilian${S.civ - before === 1 ? '' : 's'}.`); }
+      if (fx.money) { S.money += fx.money; log(`${h.name}: +${fx.money} money.`); }
+      if (fx.tollMinus) { S.tollMinus += fx.tollMinus; log(`${h.name}: toll -${fx.tollMinus} this round.`); }
+      if (fx.crossCells && S.monster) { S.pick = { n: fx.crossCells, by: id, why: `${h.name} support: cross ${fx.crossCells} health cell anywhere` }; S.phase = 'pick'; return; }
+      if (fx.peekHeroes) { if (S.heroDeck.length < fx.peekHeroes && S.heroDiscard.length) { S.heroDeck = [...S.heroDeck, ...shuffle(S.heroDiscard)]; S.heroDiscard = []; } S.peek = { by: id, cards: S.heroDeck.slice(0, fx.peekHeroes) }; if (S.peek.cards.length) { S.phase = 'peek'; return; } S.peek = null; }
+      if (fx.promoteBelow && !S.sfUsed) { const i = S.ladder.indexOf(id); if (S.ladder.slice(i + 1).some(x => x !== 'saitama')) { S.phase = 'promote'; S.promoteBy = id; return; } }
+      continue;
+    }
+    if (E.step === 'toll') {
+      if (S.monster) {
+        const m = MON[S.monster.id]; let t = m.toll;
+        if (m.fx.tollGrowth) t += S.monster.survived * m.fx.tollGrowth;
+        if (m.fx.doubleTollFromRound && S.monster.survived + 1 >= m.fx.doubleTollFromRound) t *= 2;
+        t = Math.max(0, t - S.tollMinus);
+        S.civ = Math.max(0, S.civ - t); log(`${m.name} kills ${t} civilian${t === 1 ? '' : 's'}.`);
+        if (S.civ <= 0) return endGame('lose');
+        if (m.fx.regen && S.monster.crossed.length) {
+          const back = shuffle(S.monster.crossed).slice(0, m.fx.regen);
+          S.monster.crossed = S.monster.crossed.filter(x => !back.includes(x)); log(`${m.name} regenerates ${back.length} cell${back.length === 1 ? '' : 's'}.`);
+        }
+        S.monster.survived++;
+      }
+      E.step = 'saitama'; continue;
+    }
+    if (E.step === 'saitama') {
+      if (S.saitama && S.monster) {
+        const m = MON[S.monster.id];
+        log(`Saitama finishes ${m.name} with one punch. He takes ${m.fame} fame.`);
+        moveUp('saitama', m.fame); if (m.terminal) S.terminalKilled = true; S.monster = null;
+      }
+      E.step = 'encounter'; continue;
+    }
+    if (E.step === 'encounter') { if (S.terminalKilled) { endEncounter(); if (S.result) return; } E.step = 'next'; continue; }
+    if (E.step === 'next') { S.eor = null; startRound(); return; }
+  }
+}
+function endEncounter() {
+  const pay = Math.floor(S.civ / ST.civiliansPerMoney); S.money += pay;
+  const before = S.civ; S.civ = Math.min(ST.civilians, S.civ + ST.regrowth);
+  log(`Encounter ${S.encounter} over. Payday +${pay} money, ${S.civ - before} civilians return.`, true);
+  S.heroDeck = shuffle([...S.heroDeck, ...S.heroDiscard, ...S.roster, ...S.hired.map(h => h.id), 'saitama'].filter((x, i, a) => a.indexOf(x) === i));
+  S.heroDiscard = []; S.roster = []; S.hired = []; S.saitama = false; S.sfUsed = false;
+  S.encounter++; S.round = 0;
+  if (!S.monsterDeck.length) endGame('win');
+}
+function endGame(r) { S.result = r; S.phase = 'over'; log(r === 'win' ? `Victory. ${S.civ} civilians survived.` : 'The city has fallen.', true); }
+
+// ---------- rendering
+const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+function mini(grid) { const R = grid.length, C = grid[0].length; return `<span class="mini" style="grid-template-columns:repeat(${C},7px)">${grid.map(r => [...r].map(ch => `<i class="${ch === '#' ? 'h' : ''}"></i>`).join('')).join('')}</span>`; }
+function stencil() {
+  const a = ui.attack; if (!a || a.sel == null) return null;
+  let cs = cellsOf(MOVE[a.opts[a.sel].id].grid); if (a.mir) cs = mir(cs); for (let i = 0; i < a.rot; i++) cs = rot(cs);
+  return cs;
+}
+function previewCells() {
+  const a = ui.attack, cs = stencil(); if (!cs || !a.anchor) return null;
+  const [R, C] = [monGrid().length, monGrid()[0].length], [h, w] = dims(cs);
+  if (h > R || w > C) return null;
+  const r0 = Math.min(Math.max(0, a.anchor[0] - Math.floor(h / 2)), R - h), c0 = Math.min(Math.max(0, a.anchor[1] - Math.floor(w / 2)), C - w);
+  return cs.map(([r, c]) => [r + r0, c + c0]);
+}
+
+function render() {
+  const app = document.getElementById('app');
+  if (!S) { app.innerHTML = startScreen(); return; }
+  app.innerHTML = statusBar() + `<div class="wrap">${S.phase === 'over' ? overScreen() : turnBanner() + interaction() + monsterPanel() + deployPanel()}${ladderPanel()}${logPanel()}${footer()}</div>`;
+}
+function startScreen() {
+  return `<div class="wrap start">
+    <div><div class="label">Hero Association · playtest table · rules v${D.version}</div><h1>One Punch Playtest</h1></div>
+    <p class="muted" style="margin:0">Co-op. Deploy heroes, cross out monster health, keep civilians alive, and earn fame before Saitama shows up and takes it all.</p>
+    <div class="label">Players</div>
+    <div class="seg">${[1, 2, 3, 4, 5, 6].map(n => `<button class="${ui.players === n ? 'on' : ''}" data-a="players" data-n="${n}">${n}</button>`).join('')}</div>
+    <button class="primary big" data-a="start">Start game</button>
+  </div>`;
+}
+function statusBar() {
+  const civLow = S.civ <= ST.civilians / 3;
+  return `<div class="bar"><div class="inner">
+    <div class="row between"><span class="label">Encounter ${S.encounter} · Round ${S.round} · ${S.monsterDeck.length} monsters in deck</span>
+      ${S.saitama ? '<span class="saitama-on label">Saitama on scene</span>' : ''}</div>
+    <div class="stats">
+      <div class="stat"><span class="label">Money</span><b>${S.money}</b></div>
+      <div class="stat civ ${civLow ? 'danger' : ''}"><span class="label">Civilians</span><b>${S.civ}<span class="muted" style="font-size:13px">/${ST.civilians}</span></b></div>
+      <div class="stat"><span class="label">Hired</span><b>${S.hired.length}</b></div>
+      <div class="stat" style="justify-items:end"><button class="ghost" data-a="undo" ${history.length ? '' : 'disabled'}>Undo</button></div>
+    </div></div></div>`;
+}
+function turnBanner() {
+  const who = S.players > 1 ? `Player ${S.cur + 1}` : 'Your turn';
+  if (S.phase === 'deploy') return `<div class="turn">${who}${S.players > 1 ? ' · your turn' : ''}<small>Hire or use a hero to attack, or pass. Deploying ends when everyone passes in a row${S.players > 1 ? ` (${S.passes}/${S.players} passed)` : ''}.</small></div>`;
+  return `<div class="turn">End of round<small>Resolve the steps below together.</small></div>`;
+}
+function interaction() {
+  if (S.phase === 'fame') {
+    const f = S.fame;
+    return `<div class="panel focus"><div class="label">Monster defeated</div><h2>${esc(f.name)} drops ${f.total} fame</h2>
+      <p style="margin:0">Give out <b>${f.left}</b> more token${f.left === 1 ? '' : 's'}. Each token moves a hero up one ladder slot. Decide together, then tap <b>+1</b> in the ladder below.</p>
+      ${f.left === 0 ? '<button class="primary" data-a="fameDone">Continue</button>' : ''}</div>`;
+  }
+  if (S.phase === 'pick') return `<div class="panel focus"><div class="label">Choose cells</div><p style="margin:0">${esc(S.pick.why)}. Tap ${S.pick.n} highlighted cell${S.pick.n > 1 ? 's' : ''} on the monster.</p></div>`;
+  if (S.phase === 'peek') {
+    const p = S.peek;
+    return `<div class="panel focus"><div class="label">${esc(HERO[p.by].name)} support</div><p style="margin:0">Top of the hero deck. Reorder, then confirm. The first card is drawn next.</p>
+      ${p.cards.map((id, i) => `<div class="row between"><span>${i + 1}. <b>${esc(HERO[id].name)}</b></span><span class="row"><button class="ghost" data-a="peekUp" data-i="${i}" ${i ? '' : 'disabled'}>Up</button><button class="ghost" data-a="peekDown" data-i="${i}" ${i < p.cards.length - 1 ? '' : 'disabled'}>Down</button></span></div>`).join('')}
+      <button class="primary" data-a="peekDone">Confirm order</button></div>`;
+  }
+  if (S.phase === 'promote') return `<div class="panel focus"><div class="label">Silver Fang support</div><p style="margin:0">Once per encounter: move a hero ranked below him up 1 slot. Tap <b>Train</b> in the ladder below, or skip.</p><button class="ghost" data-a="promoteSkip">Skip</button></div>`;
+  return '';
+}
+function monsterPanel() {
+  if (!S.monster) {
+    const last = S.lastKill ? `${esc(MON[S.lastKill].name)} is down.` : '';
+    return `<div class="panel"><div class="label">Monster</div><p style="margin:0">${last} The next monster arrives at the start of next round.</p></div>`;
+  }
+  const m = MON[S.monster.id], g = m.grid, cr = new Set(S.monster.crossed);
+  const pv = previewCells(), pvSet = new Set((pv || []).map(([r, c]) => k(r, c)));
+  const picking = S.phase === 'pick';
+  let toll = m.toll; if (m.fx.tollGrowth) toll += S.monster.survived * m.fx.tollGrowth; if (m.fx.doubleTollFromRound && S.monster.survived + 1 >= m.fx.doubleTollFromRound) toll *= 2;
+  const tollNow = Math.max(0, toll - S.tollMinus);
+  const cells = g.map((row, r) => [...row].map((ch, c) => {
+    const hp = ch === '#', x = hp && cr.has(k(r, c)), p = pvSet.has(k(r, c));
+    const cls = ['cell', hp && !x ? 'hp' : '', x ? 'x' : '', p ? 'pv' : '', picking && hp && !x ? 'pickable' : ''].join(' ');
+    return `<button class="${cls}" data-a="cell" data-r="${r}" data-c="${c}" aria-label="row ${r + 1} column ${c + 1}${hp ? (x ? ', crossed' : ', health') : ''}"></button>`;
+  }).join('')).join('');
+  const left = healthLeft().length, total = cellsOf(g).length;
+  return `<div class="panel ${ui.attack || picking ? 'focus' : ''}">
+    <div class="row between"><h2>${esc(m.name)}</h2><div class="chips">${m.terminal ? '<span class="chip term">Terminal</span>' : ''}<span class="chip">${m.level}</span></div></div>
+    <div class="chips"><span class="chip threat">Toll ${tollNow}${S.tollMinus ? ` (−${S.tollMinus})` : ''}</span><span class="chip">Fame ${m.fame}</span><span class="chip">Health ${left}/${total}</span></div>
+    ${m.extra ? `<div class="extra">${esc(m.extra)}</div>` : ''}
+    <div class="grid" style="--cols:${g[0].length}">${cells}</div>
+    ${attackControls()}
+  </div>`;
+}
+function attackControls() {
+  const a = ui.attack; if (!a) return '';
+  const h = HERO[a.heroId];
+  const opts = a.opts.map((o, i) => { const ok = fits(o.id, h.fx.mirror); return `<button class="${a.sel === i ? 'on' : ''}" data-a="pickMove" data-i="${i}" ${ok ? '' : 'disabled title="Does not fit this monster"'}>${mini(MOVE[o.id].grid)}<span>${o.cls} · ${esc(MOVE[o.id].name)}</span></button>`; }).join('');
+  const pv = previewCells();
+  const armorNote = MON[S.monster.id].fx.armor && a.sel != null && cellsOf(MOVE[a.opts[a.sel].id].grid).length < MON[S.monster.id].fx.armor ? '<div class="extra">Armored: this move has too few holes and will do nothing.</div>' : '';
+  return `<div style="display:grid;gap:8px">
+    <div class="label">${a.hire ? 'Hire &amp; attack' : 'Attack'} with ${esc(h.name)}${a.hire ? ` · costs ${h.cost}` : ''}</div>
+    <div class="moves">${opts}</div>
+    ${armorNote}
+    <p class="muted" style="margin:0;font-size:13px">${a.sel == null ? 'Pick a move.' : pv ? 'Tap the grid to move it, then strike.' : 'Tap the grid where the stencil should go.'}</p>
+    <div class="row"><button class="ghost" data-a="rot" ${a.sel == null ? 'disabled' : ''}>Rotate</button>${h.fx.mirror ? `<button class="ghost ${a.mir ? 'on' : ''}" data-a="mir" ${a.sel == null ? 'disabled' : ''}>Mirror</button>` : ''}
+      <button class="cape" data-a="strike" ${pv ? '' : 'disabled'}>Strike</button><button class="ghost" data-a="cancel">Cancel</button></div>
+  </div>`;
+}
+function heroCard(id, mode) {
+  const h = HERO[id], cls = heroClass(id), e = hiredOf(id);
+  const used = e ? e.acts : 0, max = actsAllowed(id);
+  const moves = usableMoves(id).map(o => `${o.cls} ${esc(MOVE[o.id].name)}`).join(', ') || 'none';
+  const canDeploy = S.phase === 'deploy' && S.monster && !ui.attack;
+  let btn = '';
+  if (mode === 'roster') btn = `<button class="primary" data-a="hire" data-id="${id}" ${canDeploy && S.money >= h.cost ? '' : 'disabled'}>Hire · ${h.cost}</button>`;
+  else btn = `<button class="primary" data-a="use" data-id="${id}" ${canDeploy && used < max ? '' : 'disabled'}>${h.fx.summonSaitama ? 'Call Saitama' : 'Attack'}</button>`;
+  const status = mode === 'hired' ? `<span class="tag">${used >= max ? 'Acted' : max > 1 ? `${max - used} attack${max - used > 1 ? 's' : ''} left` : 'Ready'}</span>` : `<span class="tag">Cost ${h.cost}</span>`;
+  return `<div class="hero ${mode === 'hired' && used >= max ? 'done' : ''}">
+    <div class="row between"><span class="row"><span class="cls ${cls}">${cls}</span><span class="name">${esc(h.name)}</span></span>${status}</div>
+    <p><b>Moves:</b> ${moves}</p><p><b>Attack:</b> ${esc(h.attack)}</p><p><b>Support:</b> ${esc(h.support)}</p>
+    <div class="row">${btn}</div></div>`;
+}
+function deployPanel() {
+  const roster = S.roster.length ? S.roster.map(id => heroCard(id, 'roster')).join('') : '<p class="muted" style="margin:0">Roster is empty.</p>';
+  const hired = S.hired.length ? S.hired.map(h => heroCard(h.id, 'hired')).join('') : '<p class="muted" style="margin:0">No heroes hired yet.</p>';
+  return `<div class="row between"><h3>Roster</h3>${S.phase === 'deploy' && !ui.attack ? `<button data-a="pass">Pass</button>` : ''}</div>
+    <div class="heroes">${roster}</div><h3>Hired</h3><div class="heroes">${hired}</div>`;
+}
+function ladderPanel() {
+  let html = '', i = 0, prev = null;
+  for (const id of S.ladder) {
+    const cls = classAt(i);
+    if (cls !== prev) { html += `<li><span></span><span class="tag">${cls}</span><span></span><span></span></li>`; prev = cls; }
+    const where = S.hired.some(h => h.id === id) ? 'hired' : S.roster.includes(id) ? 'roster' : '';
+    let btn = '';
+    if (S.phase === 'fame' && id !== 'saitama') btn = `<button class="ghost" data-a="fame" data-id="${id}" ${S.fame.left && i > 0 ? '' : 'disabled'}>+1</button>`;
+    if (S.phase === 'promote' && id !== 'saitama' && i > S.ladder.indexOf(S.promoteBy)) btn = `<button class="ghost" data-a="promote" data-id="${id}">Train</button>`;
+    html += `<li class="${id === 'saitama' ? 'sai' : ''}"><span class="n">${i + 1}</span><span class="cls ${cls}">${cls}</span><span>${esc(HERO[id].name)} ${where ? `<span class="tag">· ${where}</span>` : ''}</span>${btn || '<span></span>'}</li>`;
+    i++;
+  }
+  const open = S.phase === 'fame' || S.phase === 'promote' ? 'open' : '';
+  return `<details ${open}><summary>Ladder</summary><ol class="ladder">${html}</ol></details>`;
+}
+function logPanel() {
+  const items = S.log.slice().reverse().map(t => t.startsWith('§') ? `<li class="sep">${esc(t.slice(1))}</li>` : `<li>${esc(t)}</li>`).join('');
+  return `<details open><summary>Log</summary><ul class="log">${items}</ul></details>`;
+}
+function overScreen() {
+  const win = S.result === 'win';
+  return `<div class="panel focus over"><div class="label">Game over</div><h1>${win ? 'City saved' : 'City lost'}</h1>
+    <p style="margin:0">${win ? `All monsters cleared with ${S.civ} of ${ST.civilians} civilians alive.` : `Civilians ran out in encounter ${S.encounter}, round ${S.round}.`} Saitama ended at ladder slot ${S.ladder.indexOf('saitama') + 1}.</p>
+    <button class="primary big" data-a="newConfirmed">New game</button></div>`;
+}
+function footer() {
+  return `<div class="row between"><span class="label">Rules v${D.version}</span><button class="ghost" data-a="new">${ui.confirmNew ? 'Tap again to end this game' : 'New game'}</button></div>`;
+}
+
+// ---------- input
+document.addEventListener('click', ev => {
+  const b = ev.target.closest('[data-a]'); if (!b || b.disabled) return;
+  const a = b.dataset.a, id = b.dataset.id;
+  if (a !== 'new') ui.confirmNew = false;
+  switch (a) {
+    case 'players': ui.players = +b.dataset.n; return render();
+    case 'start': newGame(ui.players); save(); return render();
+    case 'undo': return undo();
+    case 'new': if (ui.confirmNew) { S = null; history = []; ui.confirmNew = false; try { localStorage.removeItem(KEY); } catch (e) {} } else ui.confirmNew = true; return render();
+    case 'newConfirmed': S = null; history = []; try { localStorage.removeItem(KEY); } catch (e) {} return render();
+    case 'pass': return act(pass);
+    case 'hire': case 'use': {
+      const hire = a === 'hire';
+      if (HERO[id].fx.summonSaitama) return act(() => kingSummons(id, hire));
+      const opts = usableMoves(id); const first = opts.findIndex(o => fits(o.id, HERO[id].fx.mirror));
+      ui.attack = { heroId: id, hire, opts, sel: first >= 0 ? first : null, rot: 0, mir: false, anchor: null };
+      return render();
+    }
+    case 'pickMove': ui.attack.sel = +b.dataset.i; ui.attack.rot = 0; ui.attack.mir = false; return render();
+    case 'rot': ui.attack.rot = (ui.attack.rot + 1) % 4; return render();
+    case 'mir': ui.attack.mir = !ui.attack.mir; return render();
+    case 'cancel': ui.attack = null; return render();
+    case 'strike': { const cells = previewCells(); const { heroId, hire } = ui.attack; ui.attack = null; return act(() => strike(heroId, hire, cells)); }
+    case 'cell': {
+      const r = +b.dataset.r, c = +b.dataset.c;
+      if (S.phase === 'pick') {
+        const m = MON[S.monster.id]; if (m.grid[r][c] !== '#' || S.monster.crossed.includes(k(r, c))) return;
+        return act(() => { S.monster.crossed.push(k(r, c)); log(`${HERO[S.pick.by].name} crosses 1 extra cell.`); S.pick.n--; if (S.pick.n <= 0 || !healthLeft().length) afterPick(); });
+      }
+      if (ui.attack && ui.attack.sel != null) { ui.attack.anchor = [r, c]; return render(); }
+      return;
+    }
+    case 'fame': return act(() => { moveUp(id, 1); S.fame.left--; log(`${HERO[id].name} gains 1 fame.`); });
+    case 'fameDone': return act(finishInteraction);
+    case 'peekUp': case 'peekDown': {
+      const i = +b.dataset.i, j = a === 'peekUp' ? i - 1 : i + 1; const cs = S.peek.cards; [cs[i], cs[j]] = [cs[j], cs[i]]; return render();
+    }
+    case 'peekDone': return act(() => { const n = S.peek.cards.length; S.heroDeck.splice(0, n, ...S.peek.cards); log(`${HERO[S.peek.by].name} reorders the top ${n} hero cards.`); finishInteraction(); });
+    case 'promote': return act(() => { moveUp(id, 1); S.sfUsed = true; log(`Silver Fang trains ${HERO[id].name} (+1 slot).`); finishInteraction(); });
+    case 'promoteSkip': return act(() => { log('Silver Fang skips training.'); finishInteraction(); });
+  }
+});
+
+// ---------- boot
+function start(data) {
+  if (data && data.S) { S = data.S; history = data.history || []; } else load();
+  render();
+}
+window.claude?.hot?.snapshot?.(() => ({ S, history }));
+window.claude?.hot?.ready ? window.claude.hot.ready(start) : start(window.claude?.hot?.data ?? {});
+</script>
