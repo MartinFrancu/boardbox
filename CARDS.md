@@ -16,7 +16,8 @@ C       B       A       S
 
 ### Snek
 Cost: 1
-Attack: use a stencil of his current class or lower.
+Attack: use a stencil of his current class or lower. Ambitious: if this attack
+kills the monster, Snek moves up 1 extra ladder slot.
 Support: none.
 ```
 C       B       A       S
@@ -95,8 +96,7 @@ C       B       A       S
 Cost: 2
 Attack: crosses nothing. Instead, **Saitama appears** right now: take him out
 of the hero deck (or discard pile).
-Support (hired, didn't attack this round): this round's toll -1 (monsters
-fear him).
+Support: none.
 
 ### Genos
 Cost: 3
