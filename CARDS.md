@@ -1,52 +1,66 @@
-# One Punch Man - Cards v1 (text)
+# One Punch Man - Cards v2 (text)
 
-Legend: in grids and stencils, `#` = cell / hole, `.` = empty.
-Stencil sizes grow roughly C 1–3, B 3–5, A 5–9, S 8–13 cells.
-A hero may use **any pattern up to their current class** (e.g. a B hero picks C or B).
+Legend: `#` = health cell (monster) / hole (hero stencil), `.` = empty.
 
-## Heroes (15 + Saitama)
+---------------------------------------------------------------- HEROES
 
-### 1. Mumen Rider
-Support: rescue 1 civilian (A/S: 2).
+### Mumen Rider
+Cost: 1
+Attack: use a stencil of his current class or lower.
+Support (hired, didn't attack this round): rescue 1 civilian (A/S: 2).
 ```
 C       B       A       S
 ##      ###     ###     ###
                 #.#     ###
 ```
 
-### 2. Genos
-Support: cross out 1 health cell anywhere.
-```
-C       B       A        S
-###     ####    #####    ######
-                         ######
-```
-
-### 3. Silver Fang
-Support: once per encounter, move a hero ranked below him up 1 ladder slot.
+### Snek
+Cost: 1
+Attack: use a stencil of his current class or lower.
+Support: none.
 ```
 C       B       A       S
-#.      #..     ##..    ###..
-.#      .#.     .##.    .###.
-        ..#     ..##    ..###
+##      ##      ##.     ###
+        .#      .##     .##
 ```
 
-### 4. Tatsumaki
-Support: this round's toll -1.
+### Zombieman
+Cost: 2
+Attack: use a stencil of his current class or lower. Can attack **twice** per
+round.
+Support: none.
 ```
 C       B       A       S
-#.#     .#.     ###     ####
-        ###     #.#     #..#
-        .#.     ###     #..#
+#       ##      ###     ####
+```
+
+### Puri-Puri Prisoner
+Cost: 2
+Attack: use a stencil of his current class or lower.
+Support (hired, didn't attack this round): rescue 1 civilian.
+```
+C       B       A       S
+##      #.#     #..#    #..#
+#.      ###     #..#    #..#
+                ####    #..#
                         ####
 ```
 
-### 5. King
-Attack: crosses nothing. Instead, this round's toll -1 (A/S: toll is 0).
+### Metal Bat
+Cost: 2
+Attack: use a stencil of his current class or lower. If he attacked this same
+monster in an earlier round, also cross out 1 more health cell anywhere.
 Support: none.
+```
+C       B       A       S
+##      ###     ###     ####
+        .#.     ###     ####
+```
 
-### 6. Fubuki
-Support: +1 money.
+### Fubuki
+Cost: 2
+Attack: use a stencil of her current class or lower.
+Support (hired, didn't attack this round): +1 money.
 ```
 C       B       A       S
 ##      ##      ###     ###
@@ -54,7 +68,85 @@ C       B       A       S
                 ###     ###
 ```
 
-### 7. Atomic Samurai
+### Drive Knight
+Cost: 2
+Attack: use a stencil of his current class or lower. May mirror it.
+Support: none.
+```
+C       B       A       S
+#.      ##.     ##..    ##...
+##      .##     .##.    .##..
+                ..##    ..##.
+                        ...##
+```
+
+### Tank-Top Master
+Cost: 2
+Attack: use a stencil of his current class or lower.
+Support (hired, didn't attack this round): this round's toll -1.
+```
+C       B       A       S
+##      .#.     .#.     .##.
+        ###     ###     ####
+                ###     ####
+```
+
+### King
+Cost: 2
+Attack: crosses nothing. Instead, **Saitama appears** right now: take him out
+of the hero deck (or discard pile).
+Support (hired, didn't attack this round): this round's toll -1 (monsters
+fear him).
+
+### Genos
+Cost: 3
+Attack: use a stencil of his current class or lower.
+Support (hired, didn't attack this round): cross out 1 health cell anywhere.
+```
+C       B       A        S
+###     ####    #####    ######
+                         ######
+```
+
+### Child Emperor
+Cost: 3
+Attack: use a stencil of his current class or lower.
+Support (hired, didn't attack this round): look at the top 3 hero cards and
+put them back in any order (can delay Saitama).
+```
+C       B       A        S
+#.#     #.#     #.#.#    #.#.#
+        ...     .....    .#.#.
+        #.#     #.#.#    #.#.#
+                         .#.#.
+```
+
+### Flashy Flash
+Cost: 3
+Attack: use a stencil of his current class or lower. Attacking with Flash
+doesn't end your turn; take another action.
+Support: none.
+```
+C       B       A        S
+#       #.#     #.#.#    #.#.#
+                         .#.#.
+```
+
+### Silver Fang
+Cost: 4
+Attack: use a stencil of his current class or lower.
+Support (hired, didn't attack this round): once per encounter, move a hero
+ranked below him up 1 ladder slot.
+```
+C       B       A       S
+#.      #..     ##..    ###..
+.#      .#.     .##.    .###.
+        ..#     ..##    ..###
+```
+
+### Atomic Samurai
+Cost: 4
+Attack: use a stencil of his current class or lower.
 Support: none.
 ```
 C       B       A        S
@@ -65,90 +157,31 @@ C       B       A        S
                 #...#    #.#.#
 ```
 
-### 8. Metal Bat
-Attack extra: if he attacked this same monster in an earlier round, cross out
-1 more cell anywhere.
+### Tatsumaki
+Cost: 5
+Attack: use a stencil of her current class or lower.
+Support (hired, didn't attack this round): this round's toll -1.
 ```
 C       B       A       S
-##      ###     ###     ####
-        .#.     ###     ####
-```
-
-### 9. Puri-Puri Prisoner
-Support: rescue 1 civilian.
-```
-C       B       A       S
-##      #.#     #..#    #..#
-#.      ###     #..#    #..#
-                ####    #..#
+#.#     .#.     ###     ####
+        ###     #.#     #..#
+        .#.     ###     #..#
                         ####
 ```
 
-### 10. Child Emperor
-Support: look at the top 3 hero cards and put them back in any order
-(can delay Saitama).
-```
-C       B       A        S
-#.#     #.#     #.#.#    #.#.#
-        ...     .....    .#.#.
-        #.#     #.#.#    #.#.#
-                         .#.#.
-```
-
-### 11. Zombieman
-Attack extra: can attack **twice** per round.
-```
-C       B       A       S
-#       ##      ###     ####
-```
-
-### 12. Drive Knight
-Attack extra: may mirror his stencil.
-```
-C       B       A       S
-#.      ##.     ##..    ##...
-##      .##     .##.    .##..
-                ..##    ..##.
-                        ...##
-```
-
-### 13. Tank-Top Master
-Support: this round's toll -1.
-```
-C       B       A       S
-##      .#.     .#.     .##.
-        ###     ###     ####
-                ###     ####
-```
-
-### 14. Flashy Flash
-Attack extra: attacking with Flash doesn't end your turn; take another action.
-```
-C       B       A        S
-#       #.#     #.#.#    #.#.#
-                         .#.#.
-```
-
-### 15. Snek
-Always costs 1 to hire, whatever his class.
-```
-C       B       A       S
-##      ##      ##.     ###
-        .#      .##     .##
-```
-
 ### Saitama
-Not hireable. When drawn, he **appears** (doesn't take a roster spot; draw a
-replacement). At the end of each round, he kills every monster in play and
-takes its fame. Starts in the bottom ladder slot.
+Not hireable.
+When drawn into the roster (or summoned by King), he **appears**. He doesn't
+take a roster spot; draw a replacement.
+Once he has appeared, at the end of each round he kills every monster in play
+and takes all their fame (he moves up the ladder).
+He stays until the encounter ends.
+Starts in the bottom ladder slot.
 
-## Monsters (12 normal + 3 terminal)
+---------------------------------------------------------------- MONSTERS
 
-Levels: Wolf (toll 1, fame 1), Tiger (toll 2, fame 2), Demon (toll 3, fame 3),
-Dragon (toll 4–5).
-
-### Wolf
-**Mosquito Girl** - 5 cells
+### Mosquito Girl
+Wolf · Toll 1 · Fame 1 · Health 5
 ```
 #....#
 ......
@@ -156,70 +189,90 @@ Dragon (toll 4–5).
 ......
 #....#
 ```
-**Frog Man** - 4 cells
+
+### Frog Man
+Wolf · Toll 1 · Fame 1 · Health 4
 ```
 .##.
 .##.
 ```
-**Crablante** - 6 cells
+
+### Crablante
+Wolf · Toll 1 · Fame 1 · Health 6
 ```
 #....#
 .####.
 ```
-**Subterranean King** - 5 cells
+
+### Subterranean King
+Wolf · Toll 1 · Fame 1 · Health 5
 ```
 ..#..
 .###.
 ..#..
 ```
 
-### Tiger
-**Hammerhead** - 9 cells
+### Hammerhead
+Tiger · Toll 2 · Fame 2 · Health 9
 ```
 .###..
 ######
 ```
-**Vaccine Man** - 11 cells
+
+### Vaccine Man
+Tiger · Toll 2 · Fame 2 · Health 11
 ```
 ..##..
 .####.
 .####.
 ..#...
 ```
-**Marugori** - 10 cells
+
+### Marugori
+Tiger · Toll 2 · Fame 2 · Health 10
 ```
 .####.
 ######
 ```
-**Beast King** - 9 cells
+
+### Beast King
+Tiger · Toll 2 · Fame 2 · Health 9
 ```
 #.##.#
 .####.
 ..#...
 ```
 
-### Demon
-**Carnage Kabuto** - 14 cells. Extra: from his 3rd round alive, toll is doubled.
+### Carnage Kabuto
+Demon · Toll 3 · Fame 3 · Health 14
+Extra: from his 3rd round alive, toll is doubled.
 ```
 ..##..
 .####.
 ######
 #....#
 ```
-**Ancient King** - 14 cells
+
+### Ancient King
+Demon · Toll 3 · Fame 3 · Health 14
 ```
 ######
 #....#
 ######
 ```
-**Melzargard** - 12 cells. Extra: at the end of each round, un-cross 2 health cells.
+
+### Melzargard
+Demon · Toll 3 · Fame 3 · Health 12
+Extra: at the end of each round, un-cross 2 health cells.
 ```
 #.#.#.
 .#.#.#
 #.#.#.
 .#.#.#
 ```
-**Gouketsu** - 15 cells
+
+### Gouketsu
+Demon · Toll 3 · Fame 3 · Health 15
 ```
 .####.
 ##..##
@@ -227,8 +280,9 @@ Dragon (toll 4–5).
 .###..
 ```
 
-### Terminal (end the encounter when killed)
-**Deep Sea King** - Demon, toll 3, fame 4, 16 cells.
+### Deep Sea King - TERMINAL
+Demon · Toll 3 · Fame 4 · Health 16
+Terminal: killing him ends the encounter.
 Extra: toll +1 for each round he survives.
 ```
 ..##..
@@ -236,7 +290,10 @@ Extra: toll +1 for each round he survives.
 ######
 .####.
 ```
-**Elder Centipede** - Dragon, toll 4, fame 5, 20 cells.
+
+### Elder Centipede - TERMINAL
+Dragon · Toll 4 · Fame 5 · Health 20
+Terminal: killing him ends the encounter.
 Extra: armored; stencils with fewer than 4 holes do nothing.
 ```
 ######
@@ -245,7 +302,10 @@ Extra: armored; stencils with fewer than 4 holes do nothing.
 .....#
 ######
 ```
-**Boros** - Dragon, toll 5, fame 6, 24 cells.
+
+### Boros - TERMINAL
+Dragon · Toll 5 · Fame 6 · Health 24
+Terminal: killing him ends the encounter.
 Extra: at the end of each round, un-cross 3 health cells.
 ```
 .####.
@@ -255,7 +315,8 @@ Extra: at the end of each round, un-cross 3 health cells.
 .####.
 ```
 
-## Ladder sheet
+---------------------------------------------------------------- LADDER SHEET
+
 16 slots, best (1) to worst (16):
 ```
 S: 1  2

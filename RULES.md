@@ -49,7 +49,7 @@ You lose if civilians reach 0.
    3 new heroes from the hero deck. [S]
    If Saitama is drawn, he **appears** (see Saitama).
 3. **Deploy**: players take turns around the table. On your turn either
-   - **hire** a hero from the roster: pay their cost (C=1, B=2, A=3, S=5), then
+   - **hire** a hero from the roster: pay the cost printed on their card, then
      they attack; or
    - **reuse** an already-hired hero who hasn't acted this round (free); or
    - **pass**.
@@ -63,7 +63,7 @@ You lose if civilians reach 0.
 5. **Monster dies?** When all its health cells are crossed:
    - Its fame tokens are given out; the players decide together how.
      1 fame token = the hero moves **up one slot** on the ladder and swaps with
-     the hero above. Crossing into a new class = new attack pattern (and cost).
+     the hero above. Crossing into a new class = new attack pattern.
    - Non-terminal: the next monster is drawn at the start of next round.
    - Terminal: the encounter ends (see End of encounter).
 6. **Support**: every hired hero who didn't attack this round applies their
