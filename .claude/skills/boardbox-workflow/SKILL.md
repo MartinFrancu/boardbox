@@ -67,5 +67,17 @@ Every idea the user brings up gets logged here, even passing ones.
 - **This is a record, not a to-do list.** Always do what the user asks now.
   Don't steer work toward open ideas or remind the user of them unless asked.
 
+## Scope of changes
+- **Change only what the user asked for.** No unrequested additions, removals,
+  renames, rewordings or "improvements" in files, even small ones.
+- Gaps you notice or ideas you have go in the chat as a suggestion (and into
+  `IDEAS.md` only if the user brings them up), never silently into files.
+- If a request forces a side effect (e.g. a change makes another rule
+  pointless), ask how to handle it instead of deciding.
+- When reporting a change, list exactly what changed. Don't describe untouched
+  things as new.
+- Keep the same structure and wording style across similar items (cards,
+  rules sections). When the format changes, apply it to all of them.
+
 ## Habits
 - Commit often with short messages; push the game branch.
