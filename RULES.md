@@ -17,16 +17,23 @@ You lose if civilians reach 0.
   - **Toll**: civilians it kills at the end of each round it survives.
   - **Fame**: how many fame tokens it drops when killed.
   - **Terminal** or not: a terminal monster ends the encounter when killed.
-- **Hero deck**: each hero card has a name, a picture, and an attack pattern
-  per class (C / B / A / S). Patterns are cardboard stencils with holes.
-- **Saitama card**: shuffled into the hero deck (see Saitama).
+- **Hero deck**: each hero card has a name, a picture, and per class
+  (C / B / A / S):
+  - an **attack effect**: usually an attack pattern (a cardboard stencil with
+    holes), maybe with extras;
+  - a **support effect**: happens automatically at the end of the round if the
+    hero is hired but didn't attack. E.g. Mumen Rider: rescue 1 civilian
+    (un-cross 1 box).
+- **Saitama card**: shuffled into the hero deck (see Saitama). He also has a
+  ladder token.
 - **Ladder** sheet: numbered slots, ranked best (1) to worst. Slots are grouped
   into classes, e.g. S: 1–3, A: 4–7, B: 8–12, C: 13–20 [S].
   Each hero has a token on the ladder.
 
 ## Setup
 - Shuffle the monster deck. Shuffle the hero deck, Saitama included.
-- Place every hero's token on the ladder in random order. [S, see Q3]
+- Place every hero's token on the ladder in random order, with Saitama in the
+  bottom slot.
 
 ## Structure
 - **Game** = encounters, until the monster deck is empty.
@@ -39,8 +46,8 @@ You lose if civilians reach 0.
    3 new heroes from the hero deck. [S]
    If Saitama is drawn, he **appears** (see Saitama).
 3. **Deploy**: players take turns around the table. On your turn either
-   - **hire** a hero from the roster: pay their cost [S, see Q2], then they
-     attack; or
+   - **hire** a hero from the roster: pay their cost (C=1, B=2, A=3, S=5), then
+     they attack; or
    - **reuse** an already-hired hero who hasn't acted this round (free); or
    - **pass**.
 
@@ -55,16 +62,20 @@ You lose if civilians reach 0.
      the hero above. Crossing into a new class = new attack pattern (and cost).
    - Non-terminal: the next monster is drawn at the start of next round.
    - Terminal: the encounter ends (see End of encounter).
-6. **Toll**: if a monster is still alive at the end of the round, cross out
+6. **Support**: every hired hero who didn't attack this round applies their
+   support effect.
+7. **Toll**: if a monster is still alive at the end of the round, cross out
    civilians equal to its toll.
-7. **Saitama**: if he has appeared, he kills the monster now. Its fame tokens
-   are lost.
+8. **Saitama**: if he has appeared, he kills the monster now. Saitama takes
+   its fame tokens (he moves up the ladder).
 
 ## Saitama
 - He is a card in the hero deck. When drawn, he appears and stays until the
   encounter ends.
-- At the end of each round, he kills every monster in play. Fame from those
-  monsters is lost.
+- At the end of each round, he kills every monster in play and takes their
+  fame tokens himself.
+- **[Revisit]** Heroes ranked below Saitama on the ladder can't gain fame.
+  Decide after the first playtest.
 - **So the players want to score fame before he shows up.**
 
 ## End of encounter
@@ -73,12 +84,4 @@ You lose if civilians reach 0.
 - Hired heroes return to the hero deck. Reshuffle the deck with Saitama in it. [S]
 
 ## Q (need your answer)
-- **[Q1]** "heroes have different actions, can also **save a monster**". Did you
-  mean *save a civilian*? Suggestion: a hero can either **attack** or **rescue**
-  (un-cross 1 civilian). Some heroes have special actions on their card.
-- **[Q2]** Hiring cost: fixed per hero, or set by class? Suggestion: by class
-  (C=1, B=2, A=3, S=5). Ranking up makes a hero stronger but pricier.
-- **[Q3]** Ladder: are all heroes on it from the start, or only hired ones?
-  Suggestion: all of them from the start, in random order.
-- **[Q4]** Saitama trigger: is a card in the hero deck OK? An alternative is a
-  timer, e.g. he arrives in round 4 of each encounter.
+- None right now.
