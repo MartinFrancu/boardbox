@@ -26,12 +26,15 @@ You lose if civilians reach 0.
     (un-cross 1 box).
 - **Saitama card**: shuffled into the hero deck (see Saitama). He also has a
   ladder token.
-- **Ladder** sheet: numbered slots, ranked best (1) to worst. Slots are grouped
-  into classes, e.g. S: 1–3, A: 4–7, B: 8–12, C: 13–20 [S].
+- **Ladder** sheet: 16 numbered slots, ranked best (1) to worst (16), grouped
+  into classes: S 1–2, A 3–5, B 6–10, C 11–16.
   Each hero has a token on the ladder.
 
 ## Setup
-- Shuffle the monster deck. Shuffle the hero deck, Saitama included.
+- Monster deck: shuffle the 12 normal monsters into 3 stacks of 4. Put a
+  terminal monster at the bottom of each (Deep Sea King, Elder Centipede, Boros)
+  and stack them in that order, so Boros comes last. [S]
+- Shuffle the hero deck, Saitama included.
 - Place every hero's token on the ladder in random order, with Saitama in the
   bottom slot.
 
@@ -54,7 +57,8 @@ You lose if civilians reach 0.
    Each hero acts at most once per round. The round's deploy step ends when
    everyone passes in a row.
 4. **Attack**: lay the hero's stencil (for their current class) anywhere on the
-   monster grid. You may rotate it but not mirror it. It must fit inside the
+   monster grid. You may use the pattern of the hero's current class or any
+   lower class. You may rotate it but not mirror it. It must fit inside the
    grid. Cross out the health cells under the holes.
 5. **Monster dies?** When all its health cells are crossed:
    - Its fame tokens are given out; the players decide together how.
