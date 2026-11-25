@@ -1,0 +1,7 @@
+# Ideas
+
+## Open
+
+## Done
+
+## Dismissed
