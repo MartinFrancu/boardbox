@@ -87,6 +87,8 @@ button.on { background: var(--ink); color: var(--paper) }
 .cls { font: 400 13px var(--display); border-radius: 4px; padding: 1px 6px; background: var(--ink); color: var(--paper) }
 .cls.S { background: var(--cape); color: var(--cape-ink) }
 .hero p { margin: 0; font-size: 13px }
+.movelist { display: flex; gap: 6px; flex-wrap: wrap }
+.mv { display: flex; gap: 8px; align-items: center; border: 1.5px solid var(--line); border-radius: 6px; padding: 6px 8px; font-size: 13px; font-weight: 600 }
 .hero p b { font-weight: 700 }
 
 /* ladder & log */
@@ -409,7 +411,8 @@ function attackControls() {
 function heroCard(id, mode) {
   const h = HERO[id], cls = heroClass(id), e = hiredOf(id);
   const used = e ? e.acts : 0, max = actsAllowed(id);
-  const moves = usableMoves(id).map(o => `${o.cls} ${esc(MOVE[o.id].name)}`).join(', ') || 'none';
+  const um = usableMoves(id);
+  const moves = um.length ? `<div class="movelist">${um.map(o => `<span class="mv">${mini(MOVE[o.id].grid)}<span>${o.cls} · ${esc(MOVE[o.id].name)}</span></span>`).join('')}</div>` : '<p><b>Moves:</b> none</p>';
   const canDeploy = S.phase === 'deploy' && S.monster && !ui.attack;
   let btn = '';
   if (mode === 'roster') btn = `<button class="primary" data-a="hire" data-id="${id}" ${canDeploy && S.money >= h.cost ? '' : 'disabled'}>Hire · ${h.cost}</button>`;
@@ -417,7 +420,7 @@ function heroCard(id, mode) {
   const status = mode === 'hired' ? `<span class="tag">${used >= max ? 'Acted' : max > 1 ? `${max - used} attack${max - used > 1 ? 's' : ''} left` : 'Ready'}</span>` : `<span class="tag">Cost ${h.cost}</span>`;
   return `<div class="hero ${mode === 'hired' && used >= max ? 'done' : ''}">
     <div class="row between"><span class="row"><span class="cls ${cls}">${cls}</span><span class="name">${esc(h.name)}</span></span>${status}</div>
-    <p><b>Moves:</b> ${moves}</p><p><b>Attack:</b> ${esc(h.attack)}</p><p><b>Support:</b> ${esc(h.support)}</p>
+    ${moves}<p><b>Attack:</b> ${esc(h.attack)}</p><p><b>Support:</b> ${esc(h.support)}</p>
     <div class="row">${btn}</div></div>`;
 }
 function deployPanel() {
