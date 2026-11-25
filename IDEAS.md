@@ -2,7 +2,6 @@
 
 ## Open
 - Drop hiring cost entirely for simplicity - for now cost is fixed per hero (2026-11-25)
-- Heroes below Saitama on the ladder can't gain fame - revisit after playtest (2026-11-25)
 - Multiple monsters on the board at once (2026-11-25)
 - Monsters drawn from themed "monster packs" (2026-11-25)
 - Civilians on the monster grid limit where heroes can attack - too complex for now (2026-11-25)
@@ -10,6 +9,7 @@
 - Monsters with extra rules (2026-11-25)
 
 ## Done
+- Heroes below Saitama on the ladder can't gain fame (2026-11-25)
 
 ## Dismissed
 - Semi-co-op / competitive - game is co-op, sandboxy (2026-11-25)

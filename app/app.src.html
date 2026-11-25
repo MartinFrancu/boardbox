@@ -121,7 +121,9 @@ const CLASSES = ['C', 'B', 'A', 'S'];
 const MOVE = Object.fromEntries(D.moves.map(m => [m.id, m]));
 const HERO = Object.fromEntries(D.heroes.map(h => [h.id, h]));
 HERO.saitama = { id: 'saitama', name: 'Saitama', cost: 0, moves: null, fx: {} };
-const MON = Object.fromEntries(D.monsters.map(m => [m.id, m]));
+const PAD = ST.gridPadding || 0;
+const padGrid = g => { const w = g[0].length + 2 * PAD, e = '.'.repeat(w), p = '.'.repeat(PAD); return [...Array(PAD).fill(e), ...g.map(r => p + r + p), ...Array(PAD).fill(e)]; };
+const MON = Object.fromEntries(D.monsters.map(m => [m.id, { ...m, grid: padGrid(m.grid) }]));
 const KEY = 'opm-playtest';
 
 let S = null;            // game state (undoable)
@@ -242,7 +244,7 @@ function kill(byId) {
   if (HERO[byId].fx.killBonusSlots) { moveUp(byId, HERO[byId].fx.killBonusSlots); log(`${HERO[byId].name} climbs ${HERO[byId].fx.killBonusSlots} extra slot (kill bonus).`); }
   if (m.terminal) S.terminalKilled = true;
   S.lastKill = m.id; S.monster = null;
-  S.fame = { left: m.fame, total: m.fame, name: m.name }; S.phase = 'fame';
+  S.fame = { left: m.fame, total: m.fame, name: m.name, by: byId, terminal: m.terminal }; S.phase = 'fame';
 }
 function finishInteraction() {
   S.phase = null; S.pick = null; S.peek = null; S.fame = null;
@@ -286,7 +288,10 @@ function runEOR() {
       if (S.saitama && S.monster) {
         const m = MON[S.monster.id];
         log(`Saitama finishes ${m.name} with one punch. He takes ${m.fame} fame.`);
-        moveUp('saitama', m.fame); if (m.terminal) S.terminalKilled = true; S.monster = null;
+        const from = S.ladder.indexOf('saitama') + 1;
+        moveUp('saitama', m.fame); if (m.terminal) S.terminalKilled = true; S.lastKill = m.id; S.monster = null;
+        S.saitamaKill = { name: m.name, fame: m.fame, terminal: m.terminal, from, to: S.ladder.indexOf('saitama') + 1 };
+        E.step = 'encounter'; S.phase = 'saitamaKill'; return;
       }
       E.step = 'encounter'; continue;
     }
@@ -324,7 +329,7 @@ function previewCells() {
 function render() {
   const app = document.getElementById('app');
   if (!S) { app.innerHTML = startScreen(); return; }
-  app.innerHTML = statusBar() + `<div class="wrap">${S.phase === 'over' ? overScreen() : turnBanner() + interaction() + monsterPanel() + deployPanel()}${ladderPanel()}${logPanel()}${footer()}</div>`;
+  app.innerHTML = statusBar() + `<div class="wrap">${S.phase === 'over' ? overScreen() : turnBanner() + interaction() + (S.phase === 'fame' || S.phase === 'saitamaKill' ? '' : monsterPanel()) + deployPanel()}${ladderPanel()}${logPanel()}${footer()}</div>`;
 }
 function startScreen() {
   return `<div class="wrap start">
@@ -354,10 +359,20 @@ function turnBanner() {
 }
 function interaction() {
   if (S.phase === 'fame') {
-    const f = S.fame;
-    return `<div class="panel focus"><div class="label">Monster defeated</div><h2>${esc(f.name)} drops ${f.total} fame</h2>
-      <p style="margin:0">Give out <b>${f.left}</b> more token${f.left === 1 ? '' : 's'}. Each token moves a hero up one ladder slot. Decide together, then tap <b>+1</b> in the ladder below.</p>
-      ${f.left === 0 ? '<button class="primary" data-a="fameDone">Continue</button>' : ''}</div>`;
+    const f = S.fame, canGive = f.left > 0 && S.ladder.some((id, i) => fameOk(id, i));
+    return `<div class="panel focus"><div class="label">Monster defeated${f.terminal ? ' · encounter ends after this round' : ''}</div>
+      <h2>${esc(HERO[f.by].name)} took down ${esc(f.name)}</h2>
+      <p style="margin:0">${f.total} fame to give out, <b>${f.left}</b> left. Each token moves a hero up one slot. Only heroes above Saitama can take fame.</p>
+      ${!canGive && f.left > 0 ? `<p style="margin:0" class="muted">No hero can take the remaining ${f.left} token${f.left === 1 ? '' : 's'}; they are lost.</p>` : ''}
+      <ol class="ladder">${ladderRows('fame')}</ol>
+      ${canGive ? '' : '<button class="primary" data-a="fameDone">Continue</button>'}</div>`;
+  }
+  if (S.phase === 'saitamaKill') {
+    const k2 = S.saitamaKill;
+    return `<div class="panel focus"><div class="label">One punch${k2.terminal ? ' · encounter over' : ''}</div>
+      <h2>Saitama finished ${esc(k2.name)}</h2>
+      <p style="margin:0">Nobody else gets the ${k2.fame} fame. Saitama moves from slot ${k2.from} to slot ${k2.to}${k2.to > 1 ? ', and every hero below him can no longer take fame' : ''}.</p>
+      <button class="primary" data-a="saitamaDone">Continue</button></div>`;
   }
   if (S.phase === 'pick') return `<div class="panel focus"><div class="label">Choose cells</div><p style="margin:0">${esc(S.pick.why)}. Tap ${S.pick.n} highlighted cell${S.pick.n > 1 ? 's' : ''} on the monster.</p></div>`;
   if (S.phase === 'peek') {
@@ -429,20 +444,24 @@ function deployPanel() {
   return `<div class="row between"><h3>Roster</h3>${S.phase === 'deploy' && !ui.attack ? `<button data-a="pass">Pass</button>` : ''}</div>
     <div class="heroes">${roster}</div><h3>Hired</h3><div class="heroes">${hired}</div>`;
 }
-function ladderPanel() {
+const fameOk = (id, i) => id !== 'saitama' && i > 0 && i < S.ladder.indexOf('saitama');
+function ladderRows(mode) {
   let html = '', i = 0, prev = null;
   for (const id of S.ladder) {
     const cls = classAt(i);
     if (cls !== prev) { html += `<li><span></span><span class="tag">${cls}</span><span></span><span></span></li>`; prev = cls; }
     const where = S.hired.some(h => h.id === id) ? 'hired' : S.roster.includes(id) ? 'roster' : '';
     let btn = '';
-    if (S.phase === 'fame' && id !== 'saitama') btn = `<button class="ghost" data-a="fame" data-id="${id}" ${S.fame.left && i > 0 ? '' : 'disabled'}>+1</button>`;
-    if (S.phase === 'promote' && id !== 'saitama' && i > S.ladder.indexOf(S.promoteBy)) btn = `<button class="ghost" data-a="promote" data-id="${id}">Train</button>`;
+    if (mode === 'fame' && id !== 'saitama') btn = `<button class="ghost" data-a="fame" data-id="${id}" ${S.fame.left && fameOk(id, i) ? '' : 'disabled'}>+1</button>`;
+    if (mode === 'promote' && id !== 'saitama' && i > S.ladder.indexOf(S.promoteBy)) btn = `<button class="ghost" data-a="promote" data-id="${id}">Train</button>`;
     html += `<li class="${id === 'saitama' ? 'sai' : ''}"><span class="n">${i + 1}</span><span class="cls ${cls}">${cls}</span><span>${esc(HERO[id].name)} ${where ? `<span class="tag">· ${where}</span>` : ''}</span>${btn || '<span></span>'}</li>`;
     i++;
   }
-  const open = S.phase === 'fame' || S.phase === 'promote' ? 'open' : '';
-  return `<details ${open}><summary>Ladder</summary><ol class="ladder">${html}</ol></details>`;
+  return html;
+}
+function ladderPanel() {
+  const mode = S.phase === 'promote' ? 'promote' : '';
+  return `<details ${mode ? 'open' : ''}><summary>Ladder</summary><ol class="ladder">${ladderRows(mode)}</ol></details>`;
 }
 function logPanel() {
   const items = S.log.slice().reverse().map(t => t.startsWith('§') ? `<li class="sep">${esc(t.slice(1))}</li>` : `<li>${esc(t)}</li>`).join('');
@@ -493,6 +512,7 @@ document.addEventListener('click', ev => {
     }
     case 'fame': return act(() => { moveUp(id, 1); S.fame.left--; log(`${HERO[id].name} gains 1 fame.`); });
     case 'fameDone': return act(finishInteraction);
+    case 'saitamaDone': return act(() => { S.saitamaKill = null; runEOR(); });
     case 'peekUp': case 'peekDown': {
       const i = +b.dataset.i, j = a === 'peekUp' ? i - 1 : i + 1; const cs = S.peek.cards; [cs[i], cs[j]] = [cs[j], cs[i]]; return render();
     }

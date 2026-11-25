@@ -1,5 +1,5 @@
 {
- "version": "0.1",
+ "version": "0.2",
  "setup": {
   "civilians": 30,
   "money": 5,
@@ -17,7 +17,8 @@
    "deep-sea-king",
    "elder-centipede",
    "boros"
-  ]
+  ],
+  "gridPadding": 1
  },
  "moves": [
   {

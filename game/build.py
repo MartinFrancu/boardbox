@@ -15,12 +15,17 @@ if not rules_v or rules_v.group(1) != V:
     sys.exit(f"Version mismatch: cards.json {V}, RULES.md {rules_v and rules_v.group(1)}")
 
 moves = {m['id']: m for m in data['moves']}
+PAD = data['setup'].get('gridPadding', 0)
+def padded(g):
+    w = len(g[0]) + 2 * PAD
+    return ['.' * w] * PAD + ['.' * PAD + row + '.' * PAD for row in g] + ['.' * w] * PAD
 holes = lambda g: sum(r.count('#') for r in g)
 
 # ---------------- CARDS.md
 out = [f"# One Punch Man - Cards v{V}", "",
        "Generated from `game/cards.json` by `game/build.py` - don't edit by hand.", "",
-       "Legend: `#` = health cell (monster) / hole (move stencil), `.` = empty.", "",
+       "Legend: `#` = health cell (monster) / hole (move stencil), `.` = empty.",
+       f"Monster grids include {PAD} empty border cell(s) on every side.", "",
        "Hero card fields:",
        "- Cost: money to hire.",
        "- Moves: the hero's move for each class (C / B / A / S). Stencils are in the Moves section.",
@@ -47,7 +52,7 @@ for m in data['monsters']:
     out += [f"### {m['name']}",
             f"{m['level']} · Toll {m['toll']} · Fame {m['fame']} · Health {holes(m['grid'])}",
             f"Terminal: {'yes' if m['terminal'] else 'no'}",
-            f"Extra: {m['extra'] or 'none.'}", "```", *m['grid'], "```", ""]
+            f"Extra: {m['extra'] or 'none.'}", "```", *padded(m['grid']), "```", ""]
 lad = data['setup']['ladder']; n = 0; rows = []
 for c in 'SABC':
     rows.append(f"{c}: " + '  '.join(str(i) for i in range(n + 1, n + lad[c] + 1))); n += lad[c]

@@ -1,5 +1,5 @@
 # One Punch Man - Rules
-Version: 0.1
+Version: 0.2
 
 Co-op, sandboxy. All players win or lose together.
 **[S]** = my suggestion filling a gap. It stands until you change it.
@@ -15,6 +15,8 @@ You lose if civilians reach 0.
 - **Monster deck**: each monster card has
   - a picture with a grid overlay. Some cells are **health cells**; cross them
     all out to kill it. Use a plastic sleeve + dry-erase marker.
+    The grid has one extra empty row/column on every side, so stencils can
+    hang over the monster's edge (small monsters get no advantage).
   - **Toll**: civilians it kills at the end of each round it survives.
   - **Fame**: how many fame tokens it drops when killed.
   - **Terminal** or not: a terminal monster ends the encounter when killed.
@@ -63,7 +65,8 @@ You lose if civilians reach 0.
    but not mirror it. It must fit inside the
    grid. Cross out the health cells under the holes.
 5. **Monster dies?** When all its health cells are crossed:
-   - Its fame tokens are given out; the players decide together how.
+   - Its fame tokens are given out; the players decide together how. Only
+     heroes ranked above Saitama can receive them.
      1 fame token = the hero moves **up one slot** on the ladder and swaps with
      the hero above. Crossing into a new class = new move.
    - Non-terminal: the next monster is drawn at the start of next round.
@@ -80,8 +83,7 @@ You lose if civilians reach 0.
   encounter ends.
 - At the end of each round, he kills every monster in play and takes their
   fame tokens himself.
-- **[Revisit]** Heroes ranked below Saitama on the ladder can't gain fame.
-  Decide after the first playtest.
+- Heroes ranked below Saitama on the ladder can't gain fame.
 - **So the players want to score fame before he shows up.**
 
 ## End of encounter

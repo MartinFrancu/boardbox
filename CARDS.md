@@ -1,8 +1,9 @@
-# One Punch Man - Cards v0.1
+# One Punch Man - Cards v0.2
 
 Generated from `game/cards.json` by `game/build.py` - don't edit by hand.
 
 Legend: `#` = health cell (monster) / hole (move stencil), `.` = empty.
+Monster grids include 1 empty border cell(s) on every side.
 
 Hero card fields:
 - Cost: money to hire.
@@ -404,11 +405,13 @@ Wolf · Toll 1 · Fame 1 · Health 5
 Terminal: no
 Extra: none.
 ```
-#....#
-......
-..#...
-......
-#....#
+........
+.#....#.
+........
+...#....
+........
+.#....#.
+........
 ```
 
 ### Frog Man
@@ -416,8 +419,10 @@ Wolf · Toll 1 · Fame 1 · Health 4
 Terminal: no
 Extra: none.
 ```
-.##.
-.##.
+......
+..##..
+..##..
+......
 ```
 
 ### Crablante
@@ -425,8 +430,10 @@ Wolf · Toll 1 · Fame 1 · Health 6
 Terminal: no
 Extra: none.
 ```
-#....#
-.####.
+........
+.#....#.
+..####..
+........
 ```
 
 ### Subterranean King
@@ -434,9 +441,11 @@ Wolf · Toll 1 · Fame 1 · Health 5
 Terminal: no
 Extra: none.
 ```
-..#..
-.###.
-..#..
+.......
+...#...
+..###..
+...#...
+.......
 ```
 
 ### Hammerhead
@@ -444,8 +453,10 @@ Tiger · Toll 2 · Fame 2 · Health 9
 Terminal: no
 Extra: none.
 ```
-.###..
-######
+........
+..###...
+.######.
+........
 ```
 
 ### Vaccine Man
@@ -453,10 +464,12 @@ Tiger · Toll 2 · Fame 2 · Health 11
 Terminal: no
 Extra: none.
 ```
-..##..
-.####.
-.####.
-..#...
+........
+...##...
+..####..
+..####..
+...#....
+........
 ```
 
 ### Marugori
@@ -464,8 +477,10 @@ Tiger · Toll 2 · Fame 2 · Health 10
 Terminal: no
 Extra: none.
 ```
-.####.
-######
+........
+..####..
+.######.
+........
 ```
 
 ### Beast King
@@ -473,9 +488,11 @@ Tiger · Toll 2 · Fame 2 · Health 9
 Terminal: no
 Extra: none.
 ```
-#.##.#
-.####.
-..#...
+........
+.#.##.#.
+..####..
+...#....
+........
 ```
 
 ### Carnage Kabuto
@@ -483,10 +500,12 @@ Demon · Toll 3 · Fame 3 · Health 14
 Terminal: no
 Extra: from his 3rd round alive, toll is doubled.
 ```
-..##..
-.####.
-######
-#....#
+........
+...##...
+..####..
+.######.
+.#....#.
+........
 ```
 
 ### Ancient King
@@ -494,9 +513,11 @@ Demon · Toll 3 · Fame 3 · Health 14
 Terminal: no
 Extra: none.
 ```
-######
-#....#
-######
+........
+.######.
+.#....#.
+.######.
+........
 ```
 
 ### Melzargard
@@ -504,10 +525,12 @@ Demon · Toll 3 · Fame 3 · Health 12
 Terminal: no
 Extra: at the end of each round, un-cross 2 health cells.
 ```
-#.#.#.
-.#.#.#
-#.#.#.
-.#.#.#
+........
+.#.#.#..
+..#.#.#.
+.#.#.#..
+..#.#.#.
+........
 ```
 
 ### Gouketsu
@@ -515,10 +538,12 @@ Demon · Toll 3 · Fame 3 · Health 15
 Terminal: no
 Extra: none.
 ```
-.####.
-##..##
-##..##
-.###..
+........
+..####..
+.##..##.
+.##..##.
+..###...
+........
 ```
 
 ### Deep Sea King
@@ -526,10 +551,12 @@ Demon · Toll 3 · Fame 4 · Health 16
 Terminal: yes
 Extra: toll +1 for each round he survives.
 ```
-..##..
-.####.
-######
-.####.
+........
+...##...
+..####..
+.######.
+..####..
+........
 ```
 
 ### Elder Centipede
@@ -537,11 +564,13 @@ Dragon · Toll 4 · Fame 5 · Health 20
 Terminal: yes
 Extra: armored; stencils with fewer than 4 holes do nothing.
 ```
-######
-#.....
-######
-.....#
-######
+........
+.######.
+.#......
+.######.
+......#.
+.######.
+........
 ```
 
 ### Boros
@@ -549,11 +578,13 @@ Dragon · Toll 5 · Fame 6 · Health 24
 Terminal: yes
 Extra: at the end of each round, un-cross 3 health cells.
 ```
-.####.
-######
-##..##
-######
-.####.
+........
+..####..
+.######.
+.##..##.
+.######.
+..####..
+........
 ```
 
 ---------------------------------------------------------------- LADDER SHEET
