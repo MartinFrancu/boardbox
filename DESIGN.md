@@ -71,6 +71,40 @@ What the game should feel like, and the idea pool for getting there.
 ### G. Scale
 - (U) More monsters, more places (districts).
 
+## Co-op deep dive
+
+### Why play (team goal)
+- (C) Survive the whole monster deck. Win/lose is shared.
+- (C) Association rating at the end, from civilians alive (bronze / silver /
+  gold), so even a win can be better.
+- (C) Difficulty: number of encounters, starting money, how fast Saitama
+  shows up.
+
+### Why each player matters (no "one person plays for all")
+1. (C) **Own district**: each player guards a district with its own civilians.
+   Monsters land in one district; the whole city's total is the team score.
+   You feel responsible for "your" people, but you need help.
+2. (C) **Own budget**: your district's civilians fund only you. You can donate
+   to a neighbour, at the cost of your own options. (Ties into A: civilians =
+   money.)
+3. (C) **Department roles** (asymmetric powers), e.g.
+   - Finance: better income, can lend money.
+   - Recruitment: sees/draws extra heroes, hiring discount.
+   - PR / Ranking: decides fame, extra token per kill.
+   - Emergency: evacuates civilians, reduces toll.
+   - Medical: runs the hospital, heals injured heroes.
+   - R&D: pagers and gadgets, cheaper HQ upgrades.
+4. (C) **Own heroes**: heroes you hire stay in your branch (your flats, your
+   pagers). Combos need heroes from several players, so you have to coordinate.
+5. (C) **Secret personal goal** (optional, light): e.g. "your favourite hero
+   reaches S class". Only counts if the team wins.
+
+### Fun drivers
+- Combos that need more than one player's heroes.
+- Monsters that are clearly too big for one district.
+- Saitama clock: kill before he shows up and steals the moment.
+- Sacrifice moments: a hero takes the hit for civilians and goes to hospital.
+
 ## Biggest open choice
 Co-op vs. competitive (F). It changes how money, heroes and civilians are
 owned, so it should be decided before the other picks.
